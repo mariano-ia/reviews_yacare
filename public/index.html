@@ -93,13 +93,9 @@
             <div class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-white mb-2">Tu opinión</h1>
             </div>
-            <form id="reviewForm" class="space-y-5" action="https://formsubmit.co/mariano@yacare.io" method="POST">
-                <!-- FormSubmit Options -->
-                <input type="hidden" name="_subject" value="⭐ Nueva Review desde Yacaré">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_template" value="table">
-                <!-- Redirect back to the same page with a success parameter -->
-                <input type="hidden" name="_next" id="nextUrl" value="">
+            <form id="reviewForm" name="yacare-review" method="POST" data-netlify="true" class="space-y-5">
+                <!-- Netlify Form Hidden Field -->
+                <input type="hidden" name="form-name" value="yacare-review" />
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -169,34 +165,41 @@
         const modal = document.getElementById('confirmationModal');
         let currentData = null;
 
-        // Set the _next redirect URL dynamically based on where the site is hosted
-        document.getElementById('nextUrl').value = window.location.href.split('?')[0] + '?success=true';
-
-        // Check if we just returned from a successful submission
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
-            document.getElementById('formContainer').classList.add('hidden');
-            document.getElementById('successContainer').classList.remove('hidden');
-
-            // Clean up the URL so it looks nice
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
         form.addEventListener('submit', (e) => {
-            // Prevent standard submit FOR NOW, to show confirmation modal
+            // Prevent standard submit to show confirmation modal
             e.preventDefault();
             modal.classList.add('active');
         });
 
         document.getElementById('cancelSubmit').addEventListener('click', () => modal.classList.remove('active'));
 
-        document.getElementById('confirmSubmit').addEventListener('click', () => {
+        document.getElementById('confirmSubmit').addEventListener('click', async () => {
             const btn = document.getElementById('confirmSubmit');
             btn.textContent = 'Enviando...';
             btn.disabled = true;
 
-            // Trigger the actual native form submission
-            form.submit();
+            try {
+                const formData = new FormData(form);
+                const res = await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData).toString()
+                });
+
+                if (res.ok) {
+                    modal.classList.remove('active');
+                    document.getElementById('formContainer').classList.add('hidden');
+                    document.getElementById('successContainer').classList.remove('hidden');
+                } else {
+                    alert('Error enviando. Intenta de nuevo.');
+                    btn.textContent = 'Sí, enviar';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('Error de conexión.');
+                btn.textContent = 'Sí, enviar';
+                btn.disabled = false;
+            }
         });
     </script>
 </body>
