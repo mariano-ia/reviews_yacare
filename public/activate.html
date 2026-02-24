@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activar Email | Yacaré</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center border border-gray-800 p-8 rounded-2xl bg-gray-900/50">
+        <h1 class="text-2xl font-bold mb-4">Activar FormSubmit</h1>
+        <p class="text-gray-400 mb-6 text-sm">
+            Para que los formularios invisibles (AJAX) funcionen, el primer envío debe hacerse de manera tradicional
+            para que FormSubmit autorice a <strong>mariano@yacare.io</strong>.
+        </p>
+        <form action="https://formsubmit.co/mariano@yacare.io" method="POST">
+            <input type="hidden" name="_subject" value="Verificación inicial de Yacaré">
+            <input type="email" name="email" value="mariano@yacare.io" class="hidden">
+            <button type="submit" class="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-200">
+                Enviar Correo de Verificación
+            </button>
+        </form>
+    </div>
+</body>
+
+</html>
