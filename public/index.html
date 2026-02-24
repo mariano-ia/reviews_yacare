@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yacaré | Review</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { yacare: { dark: '#0A0A0A', gray: '#171717', border: '#262626' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0A0A0A;
+            color: #EDEDED;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input,
+        textarea {
+            background-color: transparent;
+            border: 1px solid #262626;
+            color: #EDEDED;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ededed;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            color: #262626;
+            font-size: 2.5rem;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover~label,
+        .star-rating input:checked~label {
+            color: #FACC15;
+        }
+
+        .modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+    <main class="w-full max-w-lg relative z-10" id="mainCard">
+        <div id="formContainer"
+            class="bg-yacare-gray/50 backdrop-blur-xl border border-yacare-border rounded-2xl p-8 shadow-2xl">
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-white mb-2">Tu opinión</h1>
+            </div>
+            <form id="reviewForm" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase mb-1.5">Nombre</label>
+                        <input type="text" name="name" required
+                            class="w-full bg-black/50 border border-yacare-border rounded-lg px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase mb-1.5">Empresa</label>
+                        <input type="text" name="company" required
+                            class="w-full bg-black/50 border border-yacare-border rounded-lg px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1.5">Email</label>
+                    <input type="email" name="email" required
+                        class="w-full bg-black/50 border border-yacare-border rounded-lg px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1.5">Tu Reporte /
+                        Comentario</label>
+                    <textarea name="comment" required rows="4"
+                        class="w-full bg-black/50 border border-yacare-border rounded-lg px-4 py-3 text-sm resize-none placeholder-gray-600 focus:outline-none focus:border-white"></textarea>
+                </div>
+                <div>
+                    <label
+                        class="block text-xs font-semibold text-gray-400 uppercase mb-2 text-center">Calificación</label>
+                    <div class="flex justify-center">
+                        <div class="star-rating">
+                            <input type="radio" id="s5" name="rating" value="5" required><label for="s5">★</label>
+                            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+                            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+                            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+                            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-200">Enviar</button>
+            </form>
+        </div>
+
+        <div id="successContainer" class="hidden text-center mt-10">
+            <h2 class="text-3xl font-bold text-white mb-3">¡Gracias!</h2>
+            <p class="text-gray-400 text-lg">Yacaré ya sabe tu review.</p>
+        </div>
+    </main>
+
+    <div id="confirmationModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="modalBackdrop"></div>
+        <div
+            class="modal-content relative z-10 bg-yacare-gray border border-yacare-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-2">¿Estás seguro?</h3>
+            <p class="text-gray-400 text-sm mb-6">Estás a punto de enviar esta review a Yacaré.</p>
+            <div class="flex gap-3">
+                <button type="button" id="cancelSubmit"
+                    class="flex-1 bg-transparent border border-yacare-border text-white font-medium rounded-lg py-2.5 hover:bg-yacare-border/50 transition-colors">Cancelar</button>
+                <button type="button" id="confirmSubmit"
+                    class="flex-1 bg-white text-black font-medium rounded-lg py-2.5 hover:bg-gray-200 transition-colors">Sí,
+                    enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('reviewForm');
+        const modal = document.getElementById('confirmationModal');
+        let currentData = null;
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentData = Object.fromEntries(new FormData(form));
+            modal.classList.add('active');
+        });
+
+        document.getElementById('cancelSubmit').addEventListener('click', () => modal.classList.remove('active'));
+
+        document.getElementById('confirmSubmit').addEventListener('click', async () => {
+            const btn = document.getElementById('confirmSubmit');
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentData)
+                });
+
+                if (res.ok) {
+                    modal.classList.remove('active');
+                    document.getElementById('formContainer').classList.add('hidden');
+                    document.getElementById('successContainer').classList.remove('hidden');
+                } else {
+                    alert('Error enviando. Intenta de nuevo.');
+                    btn.textContent = 'Sí, enviar';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('Error de conexión.');
+                btn.textContent = 'Sí, enviar';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

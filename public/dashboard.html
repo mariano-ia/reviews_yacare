@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yacaré | Dashboard de Reviews</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { yacare: { dark: '#0A0A0A', gray: '#171717', border: '#262626' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0A0A0A;
+            color: #EDEDED;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .star-filled {
+            color: #FACC15;
+        }
+
+        .star-empty {
+            color: #262626;
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-6 md:p-12">
+    <main class="max-w-4xl mx-auto">
+        <header class="mb-10 flex justify-between items-end border-b border-yacare-border pb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Reviews de Yacaré</h1>
+                <p class="text-gray-400">Panel privado con el feedback de los clientes.</p>
+            </div>
+            <div class="text-right">
+                <span id="reviewCount" class="text-2xl font-bold text-white">0</span>
+                <span class="text-gray-400 text-sm ml-1">reviews totales</span>
+            </div>
+        </header>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center py-20">
+            <div class="loader mb-4"></div>
+            <p class="text-gray-400">Cargando reviews...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty"
+            class="hidden text-center py-20 bg-yacare-gray/30 rounded-2xl border border-yacare-border border-dashed">
+            <p class="text-gray-400 text-lg">Aún no hay reviews registradas.</p>
+        </div>
+
+        <!-- Reviews List -->
+        <div id="reviewsList" class="hidden space-y-6">
+            <!-- Reviews will be injected here via JS -->
+        </div>
+
+    </main>
+
+    <script>
+        function generateStars(rating) {
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHTML += `<span class="text-xl ${i <= rating ? 'star-filled' : 'star-empty'}">★</span>`;
+            }
+            return starsHTML;
+        }
+
+        function renderReview(review) {
+            const date = new Date(review.timestamp || Date.now()).toLocaleDateString('es-ES', {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            return `
+                <div class="bg-yacare-gray/50 border border-yacare-border rounded-xl p-6 transition hover:border-gray-600">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">${review.name}</h3>
+                            <div class="text-sm text-gray-400 mt-1">
+                                <span class="font-medium text-gray-300">${review.company}</span> • ${review.email}
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <div class="flex">${generateStars(parseInt(review.rating))}</div>
+                            <span class="text-xs text-gray-500 mt-2">${date}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-yacare-border/50">
+                        <p class="text-gray-300 leading-relaxed whitespace-pre-wrap">${review.comment}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function fetchReviews() {
+            const loading = document.getElementById('loading');
+            const empty = document.getElementById('empty');
+            const reviewsList = document.getElementById('reviewsList');
+            const countEl = document.getElementById('reviewCount');
+
+            try {
+                const response = await fetch('/api/reviews');
+                if (!response.ok) throw new Error('Error fetching');
+
+                const reviews = await response.json();
+
+                loading.classList.add('hidden');
+
+                if (reviews.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    countEl.textContent = reviews.length;
+                    // Sort nearest first by timestamp if exists
+                    const sortedReviews = reviews.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                    const html = sortedReviews.map(r => renderReview(r)).join('');
+                    reviewsList.innerHTML = html;
+                    reviewsList.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error(error);
+                loading.innerHTML = '<p class="text-red-400">Error al cargar las reviews. Verifica tu conexión o intenta más tarde.</p>';
+            }
+        }
+
+        // Initialize
+        fetchReviews();
+    </script>
+</body>
+
+</html>
