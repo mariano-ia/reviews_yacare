@@ -188,8 +188,11 @@
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        Nombre: currentData.name,
-                        Correo: currentData.email,
+                        _subject: "⭐ Nueva Review desde Yacaré",
+                        _template: "table",
+                        _captcha: "false",
+                        name: currentData.name,
+                        email: currentData.email,
                         Empresa: currentData.company,
                         Calificacion: currentData.rating + ' Estrellas',
                         Comentario: currentData.comment
