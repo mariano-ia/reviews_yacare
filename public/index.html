@@ -93,7 +93,8 @@
             <div class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-white mb-2">Tu opinión</h1>
             </div>
-            <form id="reviewForm" name="yacare-review" method="POST" data-netlify="true" class="space-y-5">
+            <form id="reviewForm" name="yacare-review" method="POST" action="/exito.html" data-netlify="true"
+                class="space-y-5">
                 <!-- Netlify Form Hidden Field -->
                 <input type="hidden" name="form-name" value="yacare-review" />
 
@@ -137,11 +138,6 @@
                     class="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-200">Enviar</button>
             </form>
         </div>
-
-        <div id="successContainer" class="hidden text-center mt-10">
-            <h2 class="text-3xl font-bold text-white mb-3">¡Gracias!</h2>
-            <p class="text-gray-400 text-lg">Yacaré ya sabe tu review.</p>
-        </div>
     </main>
 
     <div id="confirmationModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -163,7 +159,6 @@
     <script>
         const form = document.getElementById('reviewForm');
         const modal = document.getElementById('confirmationModal');
-        let currentData = null;
 
         form.addEventListener('submit', (e) => {
             // Prevent standard submit to show confirmation modal
@@ -173,33 +168,13 @@
 
         document.getElementById('cancelSubmit').addEventListener('click', () => modal.classList.remove('active'));
 
-        document.getElementById('confirmSubmit').addEventListener('click', async () => {
+        document.getElementById('confirmSubmit').addEventListener('click', () => {
             const btn = document.getElementById('confirmSubmit');
             btn.textContent = 'Enviando...';
             btn.disabled = true;
 
-            try {
-                const formData = new FormData(form);
-                const res = await fetch('/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(formData).toString()
-                });
-
-                if (res.ok) {
-                    modal.classList.remove('active');
-                    document.getElementById('formContainer').classList.add('hidden');
-                    document.getElementById('successContainer').classList.remove('hidden');
-                } else {
-                    alert('Error enviando. Intenta de nuevo.');
-                    btn.textContent = 'Sí, enviar';
-                    btn.disabled = false;
-                }
-            } catch (e) {
-                alert('Error de conexión.');
-                btn.textContent = 'Sí, enviar';
-                btn.disabled = false;
-            }
+            // Trigger the actual native form submission immediately
+            form.submit();
         });
     </script>
 </body>
