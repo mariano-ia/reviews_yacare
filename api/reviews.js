@@ -23,16 +23,6 @@ export default async function handler(request, response) {
         return response.status(200).json([]);
     }
 
-    // TEMPORARY CLEAR LOGIC
-    if (request.query.clear === 'true') {
-        try {
-            await redis.del('yacare_reviews');
-            return response.status(200).json({ success: true, message: "Reviews eliminadas temporalmente" });
-        } catch (error) {
-            return response.status(500).json({ error: "No se pudo limpiar" });
-        }
-    }
-
     try {
         const reviewsStrings = await redis.lrange('yacare_reviews', 0, -1);
         const reviews = reviewsStrings.map(str => {
